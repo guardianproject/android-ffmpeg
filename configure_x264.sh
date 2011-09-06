@@ -8,7 +8,6 @@ pushd x264
 --sysroot="$NDK_SYSROOT" \
 --host=arm-linux \
 --enable-pic \
---enable-shared \
 --enable-static \
 --disable-cli
 

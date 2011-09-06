@@ -2,16 +2,6 @@
 pushd `dirname $0`
 . settings.sh
 
-if [[ $minimal_featureset == 1 ]]; then
-  echo "Using minimal featureset"
-  featureflags="--disable-everything \
---enable-decoder=mjpeg --enable-demuxer=mjpeg --enable-parser=mjpeg \
---enable-demuxer=image2 --enable-muxer=mp4 --enable-encoder=libx264 --enable-libx264 \
---enable-decoder=rawvideo \
---enable-protocol=file \
---enable-hwaccels"
-fi
-
 if [[ $DEBUG == 1 ]]; then
   echo "DEBUG = 1"
   DEBUG_FLAG="--disable-stripping"
@@ -25,17 +15,31 @@ pushd ffmpeg
 --target-os=linux \
 --disable-stripping \
 --prefix=../output \
---disable-neon \
---enable-version3 \
+--enable-pic \
 --disable-shared \
 --enable-static \
+--enable-cross-compile \
+--cross-prefix=$NDK_TOOLCHAIN_BASE/bin/arm-linux-androideabi- \
+--sysroot="$NDK_SYSROOT" \
+--extra-cflags="-I../x264" \
+--extra-ldflags="-L../x264" \
+--enable-version3 \
 --enable-gpl \
 --enable-memalign-hack \
---cc=arm-linux-androideabi-gcc \
---ld=arm-linux-androideabi-ld \
---extra-cflags="-fPIC -DANDROID -D__thumb__ -mthumb -Wfatal-errors -Wno-deprecated" \
-$featureflags \
---disable-ffmpeg \
+--disable-doc \
+--enable-yasm \
+--disable-everything \
+--enable-decoder=mjpeg \
+--enable-demuxer=mjpeg \
+--enable-parser=mjpeg \
+--enable-demuxer=image2 \
+--enable-muxer=mp4 \
+--enable-encoder=libx264 \
+--enable-libx264 \
+--enable-decoder=rawvideo \
+--enable-protocol=file \
+--enable-hwaccels \
+--enable-ffmpeg \
 --disable-ffplay \
 --disable-ffprobe \
 --disable-ffserver \
@@ -45,8 +49,6 @@ $featureflags \
 --disable-demuxer=v4l \
 --disable-demuxer=v4l2 \
 --disable-indev=v4l \
---disable-indev=v4l2 \
---extra-cflags="-I../x264 -Ivideokit" \
---extra-ldflags="-L../x264" 
+--disable-indev=v4l2
 
 popd; popd
