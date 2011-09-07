@@ -2,6 +2,8 @@
 pushd `dirname $0`
 . settings.sh
 
+find . -name \*.o -delete
+
 pushd x264
 make clean
 
