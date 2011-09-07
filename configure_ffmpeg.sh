@@ -9,6 +9,10 @@ fi
 
 pushd ffmpeg
 
+# apply patch to get 'redact' filter
+test ffmpeg/libavfilter/vf_redact.c || \
+    patch -p1 < ../0001-add-filter-to-redact-regions-configured-by-a-text-fi.patch
+
 ./configure \
 $DEBUG_FLAG \
 --enable-cross-compile \
@@ -51,6 +55,8 @@ $DEBUG_FLAG \
 --enable-filter=buffer \
 --enable-filter=buffersink \
 --enable-filter=drawbox \
+--enable-filter=overlay \
+--enable-filter=redact \
 \
 --disable-protocols \
 --enable-protocol=file \
