@@ -9,45 +9,62 @@ fi
 
 pushd ffmpeg
 
-./configure $DEBUG_FLAG --enable-cross-compile \
---arch=arm5te \
---enable-armv5te \
+./configure \
+$DEBUG_FLAG \
+--enable-cross-compile \
+--arch=armv5te \
+--cpu=armv5te \
 --target-os=linux \
---disable-stripping \
+--enable-runtime-cpudetect \
 --prefix=../output \
 --enable-pic \
 --disable-shared \
 --enable-static \
---enable-cross-compile \
 --cross-prefix=$NDK_TOOLCHAIN_BASE/bin/arm-linux-androideabi- \
 --sysroot="$NDK_SYSROOT" \
---extra-cflags="-I../x264" \
---extra-ldflags="-L../x264" \
 --enable-version3 \
 --enable-gpl \
 --enable-memalign-hack \
 --disable-doc \
 --enable-yasm \
---disable-everything \
+\
+--disable-decoders \
 --enable-decoder=mjpeg \
---enable-demuxer=mjpeg \
---enable-parser=mjpeg \
---enable-demuxer=image2 \
---enable-muxer=mp4 \
---enable-encoder=libx264 \
---enable-libx264 \
 --enable-decoder=rawvideo \
+\
+--disable-encoders \
+--enable-encoder=libx264 \
+\
+--disable-muxers \
+--enable-muxer=mp4 \
+\
+--disable-demuxers \
+--enable-demuxer=image2 \
+--enable-demuxer=mjpeg \
+--enable-demuxer=mp4 \
+--enable-demuxer=mov \
+\
+--disable-parsers \
+--enable-parser=mjpeg \
+\
+--disable-filters \
+--enable-filter=buffer \
+--enable-filter=buffersink \
+--enable-filter=drawbox \
+\
+--disable-protocols \
 --enable-protocol=file \
+\
 --enable-hwaccels \
+\
 --enable-ffmpeg \
 --disable-ffplay \
 --disable-ffprobe \
 --disable-ffserver \
 --disable-network \
---enable-filter=buffer \
---enable-filter=buffersink \
---disable-demuxer=v4l \
---disable-demuxer=v4l2 \
+--enable-libx264 \
+--extra-cflags="-I../x264" \
+--extra-ldflags="-L../x264" \
 --disable-indev=v4l \
 --disable-indev=v4l2
 
