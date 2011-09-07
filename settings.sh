@@ -3,7 +3,8 @@
 # set the base path to your Android NDK (or export NDK to environment)
 
 if [[ "x$NDK_BASE" == "x" ]]; then
-NDK_BASE=/usr/local/android-ndk
+    NDK_BASE=/usr/local/android-ndk
+    echo "No NDK_BASE set, using $NDK_BASE"
 fi
 
 NDK_PLATFORM_VERSION=3
@@ -17,13 +18,6 @@ LD=$NDK_TOOLCHAIN_BASE/bin/arm-linux-androideabi-ld
 # changed 0 to the default, so it'll compile shitloads of codecs normally
 if [[ "x$minimal_featureset" == "x" ]]; then
 minimal_featureset=1
-fi
-
-## stop editing
-
-if [[ ! -d $NDK ]]; then
-  echo "$NDK is not a directory. Exiting."
-  exit 1
 fi
 
 function current_dir {
