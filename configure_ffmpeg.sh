@@ -10,8 +10,17 @@ fi
 pushd ffmpeg
 
 # apply patch to get 'redact' filter
-test ffmpeg/libavfilter/vf_redact.c || \
+test -e ffmpeg/libavfilter/vf_redact.c || \
     patch -p1 < ../0001-add-filter-to-redact-regions-configured-by-a-text-fi.patch
+
+
+#--disable-decoders \
+#--disable-encoders \
+#--disable-muxers \
+#--disable-demuxers \
+#--disable-parsers \
+#--disable-filters \
+#--disable-protocols \
 
 ./configure \
 $DEBUG_FLAG \
@@ -20,7 +29,7 @@ $DEBUG_FLAG \
 --cpu=armv5te \
 --target-os=linux \
 --enable-runtime-cpudetect \
---prefix=../output \
+--prefix=/data/data/org.witness.sscvideoproto \
 --enable-pic \
 --disable-shared \
 --enable-static \
@@ -32,33 +41,26 @@ $DEBUG_FLAG \
 --disable-doc \
 --enable-yasm \
 \
---disable-decoders \
 --enable-decoder=mjpeg \
 --enable-decoder=rawvideo \
 \
---disable-encoders \
 --enable-encoder=libx264 \
 \
---disable-muxers \
 --enable-muxer=mp4 \
 \
---disable-demuxers \
 --enable-demuxer=image2 \
 --enable-demuxer=mjpeg \
 --enable-demuxer=mp4 \
 --enable-demuxer=mov \
 \
---disable-parsers \
 --enable-parser=mjpeg \
 \
---disable-filters \
 --enable-filter=buffer \
 --enable-filter=buffersink \
 --enable-filter=drawbox \
 --enable-filter=overlay \
 --enable-filter=redact \
 \
---disable-protocols \
 --enable-protocol=file \
 \
 --enable-hwaccels \
@@ -71,6 +73,7 @@ $DEBUG_FLAG \
 --enable-libx264 \
 --extra-cflags="-I../x264" \
 --extra-ldflags="-L../x264" \
+--disable-avdevice \
 --disable-indev=v4l \
 --disable-indev=v4l2
 
