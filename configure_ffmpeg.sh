@@ -10,9 +10,8 @@ fi
 pushd ffmpeg
 
 # apply patch to get 'redact' filter
-test -e ffmpeg/libavfilter/vf_redact.c || \
+test -e libavfilter/vf_redact.c || \
     patch -p1 < ../0001-add-filter-to-redact-regions-configured-by-a-text-fi.patch
-
 
 #--disable-decoders \
 #--disable-encoders \
