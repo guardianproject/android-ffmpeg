@@ -13,6 +13,9 @@ pushd ffmpeg
 test -e libavfilter/vf_redact.c || \
     patch -p1 < ../0001-add-filter-to-redact-regions-configured-by-a-text-fi.patch
 
+# build fix
+patch -p1 -N --reject-file=- <  ../swscale-fix.diff
+
 #--disable-decoders \
 #--disable-encoders \
 #--disable-muxers \
