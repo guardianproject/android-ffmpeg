@@ -27,14 +27,15 @@ patch -p1 -N --reject-file=- <  ../swscale-fix.diff
 ./configure \
 $DEBUG_FLAG \
 --enable-cross-compile \
---arch=armv5te \
---cpu=armv5te \
+--arch=arm \
+--cpu=cortex-a8 \
 --target-os=linux \
 --enable-runtime-cpudetect \
 --prefix=/data/data/org.witness.sscvideoproto \
 --enable-pic \
 --disable-shared \
 --enable-static \
+--enable-small \
 --cross-prefix=$NDK_TOOLCHAIN_BASE/bin/arm-linux-androideabi- \
 --sysroot="$NDK_SYSROOT" \
 --enable-version3 \
@@ -73,10 +74,17 @@ $DEBUG_FLAG \
 --disable-ffserver \
 --disable-network \
 --enable-libx264 \
+--enable-zlib \
 --extra-cflags="-I../x264" \
 --extra-ldflags="-L../x264" \
 --disable-avdevice \
---disable-indev=v4l \
---disable-indev=v4l2
+--disable-devices
 
 popd; popd
+
+# for NEON, but it apparently doesn't help (yet)
+#--cpu=cortex-a8 \
+#--enable-neon \
+#--extra-cflags="-mfloat-abi=softfp -mfpu=neon -I../x264" \
+
+
