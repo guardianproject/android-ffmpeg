@@ -9,13 +9,6 @@ fi
 
 pushd ffmpeg
 
-# apply patch to get 'redact' filter
-test -e libavfilter/vf_redact.c || \
-    patch -p1 < ../0001-add-filter-to-redact-regions-configured-by-a-text-fi.patch
-
-# build fix
-patch -p1 -N --reject-file=- <  ../swscale-fix.diff
-
 #--disable-decoders \
 #--disable-encoders \
 #--disable-muxers \
@@ -81,10 +74,5 @@ $DEBUG_FLAG \
 --disable-devices
 
 popd; popd
-
-# for NEON, but it apparently doesn't help (yet)
-#--cpu=cortex-a8 \
-#--enable-neon \
-#--extra-cflags="-mfloat-abi=softfp -mfpu=neon -I../x264" \
 
 
