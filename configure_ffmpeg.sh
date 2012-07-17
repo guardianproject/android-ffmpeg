@@ -7,6 +7,12 @@ if [[ $DEBUG == 1 ]]; then
   DEBUG_FLAG="--disable-stripping"
 fi
 
+# I haven't found a reliable way to install/uninstall a patch from a Makefile,
+# so just always try to apply it, and ignore it if it fails. Works fine unless
+# the files being patched have changed, in which cause a partial application
+# could happen unnoticed.
+patch -N -p1 --reject-file=- < redact-plugins.patch
+
 pushd ffmpeg
 
 #--disable-decoders \
