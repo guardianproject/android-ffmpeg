@@ -43,27 +43,73 @@ $DEBUG_FLAG \
 --disable-doc \
 --enable-yasm \
 \
+--disable-decoders \
+--enable-decoder=aac \
+--enable-decoder=amrnb \
+--enable-decoder=amrwb \
+--enable-decoder=h264 \
 --enable-decoder=mjpeg \
 --enable-decoder=rawvideo \
 \
+--disable-encoders \
+--enable-encoder=aac \
 --enable-encoder=libx264 \
+--enable-encoder=mpeg2video \
+--enable-encoder=mpeg4 \
+--enable-encoder=pcm_f32le \
+--enable-encoder=pcm_s16le \
+--enable-encoder=pcm_u16le \
 \
+--disable-muxers \
 --enable-muxer=mp4 \
+--enable-muxer=matroska \
+--enable-muxer=matroska_audio \
+--enable-muxer=mpeg2video \
+--enable-muxer=mpegts \
+--enable-muxer=yuv4mpegpipe \
 \
+--disable-demuxers \
+--enable-demuxer=aac \
+--enable-demuxer=amr \
 --enable-demuxer=image2 \
 --enable-demuxer=mjpeg \
+--enable-demuxer=mp3 \
 --enable-demuxer=mp4 \
 --enable-demuxer=mov \
+--enable-demuxer=wav \
 \
+--disable-parsers \
+--enable-parser=aac \
+--enable-parser=aac_latm \
+--enable-parser=h264 \
 --enable-parser=mjpeg \
+--enable-parser=mpeg4video \
+--enable-parser=mpegaudio \
+--enable-parser=mpegvideo \
 \
---enable-filter=buffer \
+--disable-protocols \
+--enable-protocol=cache \
+--enable-protocol=concat \
+--enable-protocol=file \
+--enable-protocol=md5 \
+--enable-protocol=pipe \
+\
+--disable-filters \
+--enable-filter=amerge \
+--enable-filter=amix \
+--enable-filter=aredact \
+--enable-filter=aresample \
+--enable-filter=volume \
 --enable-filter=buffersink \
 --enable-filter=drawbox \
 --enable-filter=overlay \
 --enable-filter=redact \
 \
---enable-protocol=file \
+--disable-bsfs \
+\
+--disable-indevs \
+--enable-indev=lavfi \
+--disable-outdevs \
 \
 --enable-hwaccels \
 \
