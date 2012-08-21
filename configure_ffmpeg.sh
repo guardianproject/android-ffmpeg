@@ -35,7 +35,7 @@ $DEBUG_FLAG \
 --disable-shared \
 --enable-static \
 --enable-small \
---cross-prefix=$NDK_TOOLCHAIN_BASE/bin/arm-linux-androideabi- \
+--cross-prefix=$NDK_TOOLCHAIN_BASE/bin/$NDK_ABI-linux-androideabi- \
 --sysroot="$NDK_SYSROOT" \
 --enable-version3 \
 --enable-gpl \

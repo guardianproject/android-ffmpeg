@@ -7,7 +7,7 @@ changeable, static ffmpeg creator for Android.  The result is a single
 setup
 -----
 
- 1. Install the Android NDK
+ 1. Install the Android NDK r8 or newer
  2. On Debian/Ubuntu, run: apt-get install yasm bash patch make
 
 
