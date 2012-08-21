@@ -1,41 +1,31 @@
 cd ~/code/eighthave/ffmpeg
-git diff n0.10.4..redact > ~/code/guardianproject/android-ffmpeg/redact-plugins.patch
-diff --git a/ffmpeg/aredact_unsort.txt b/ffmpeg/aredact_unsort.txt
-new file mode 100644
-index 0000000..9314628
---- /dev/null
-+++ b/ffmpeg/aredact_unsort.txt
-@@ -0,0 +1,4 @@
-+1.129,2.391,mute
-+3.129,4.391,buzzer
-+5.129,6.391,resample
-+7.129,8.391,none
+git diff n0.11.1..redact-0.11.1 > ~/code/guardianproject/android-ffmpeg/redact-plugins.patch
 diff --git a/ffmpeg/libavfilter/Makefile b/ffmpeg/libavfilter/Makefile
-index 82407e2..9c61477 100644
+index 29345fc..9812a94 100644
 --- a/ffmpeg/libavfilter/Makefile
 +++ b/ffmpeg/libavfilter/Makefile
-@@ -30,6 +30,7 @@ OBJS-$(CONFIG_ACONVERT_FILTER)               += af_aconvert.o
- OBJS-$(CONFIG_AFORMAT_FILTER)                += af_aformat.o
+@@ -49,6 +49,7 @@ OBJS-$(CONFIG_AFORMAT_FILTER)                += af_aformat.o
  OBJS-$(CONFIG_AMERGE_FILTER)                 += af_amerge.o
+ OBJS-$(CONFIG_AMIX_FILTER)                   += af_amix.o
  OBJS-$(CONFIG_ANULL_FILTER)                  += af_anull.o
 +OBJS-$(CONFIG_AREDACT_FILTER)                += af_aredact.o
  OBJS-$(CONFIG_ARESAMPLE_FILTER)              += af_aresample.o
  OBJS-$(CONFIG_ASHOWINFO_FILTER)              += af_ashowinfo.o
- OBJS-$(CONFIG_ASPLIT_FILTER)                 += af_asplit.o
-@@ -76,6 +77,7 @@ OBJS-$(CONFIG_OCV_FILTER)                    += vf_libopencv.o
+ OBJS-$(CONFIG_ASPLIT_FILTER)                 += split.o
+@@ -101,6 +102,7 @@ OBJS-$(CONFIG_OCV_FILTER)                    += vf_libopencv.o
  OBJS-$(CONFIG_OVERLAY_FILTER)                += vf_overlay.o
  OBJS-$(CONFIG_PAD_FILTER)                    += vf_pad.o
  OBJS-$(CONFIG_PIXDESCTEST_FILTER)            += vf_pixdesctest.o
 +OBJS-$(CONFIG_REDACT_FILTER)                 += vf_redact.o
- OBJS-$(CONFIG_SCALE_FILTER)                  += vf_scale.o
+ OBJS-$(CONFIG_REMOVELOGO_FILTER)             += bbox.o lswsutils.o lavfutils.o vf_removelogo.o
  OBJS-$(CONFIG_SELECT_FILTER)                 += vf_select.o
  OBJS-$(CONFIG_SETDAR_FILTER)                 += vf_aspect.o
 diff --git a/ffmpeg/libavfilter/af_aredact.c b/ffmpeg/libavfilter/af_aredact.c
 new file mode 100644
-index 0000000..4d953e5
+index 0000000..ae77b0f
 --- /dev/null
 +++ b/ffmpeg/libavfilter/af_aredact.c
-@@ -0,0 +1,406 @@
+@@ -0,0 +1,408 @@
 +/*
 + * Copyright (c) 2011 Hans-Christoph Steiner
 + * Copyright (c) 2011 Stefano Sabatini
@@ -66,7 +56,9 @@ index 0000000..4d953e5
 +#include "libavutil/avstring.h"
 +#include "libavutil/audioconvert.h"
 +#include "libavutil/eval.h"
++#include "audio.h"
 +#include "avfilter.h"
++#include "formats.h"
 +
 +/* for lazy char* allocation */
 +#define BUFLEN 1000
@@ -180,6 +172,7 @@ index 0000000..4d953e5
 +static int query_formats(AVFilterContext *ctx)
 +{
 +    AVFilterFormats *formats = NULL;
++    AVFilterChannelLayouts *layouts;
 +    enum AVSampleFormat sample_fmts[] = {
 +        AV_SAMPLE_FMT_U8,
 +        AV_SAMPLE_FMT_S16,
@@ -188,22 +181,21 @@ index 0000000..4d953e5
 +        AV_SAMPLE_FMT_DBL,
 +        AV_SAMPLE_FMT_NONE
 +    };
-+    int packing_fmts[] = { AVFILTER_PACKED, -1 };
 +
-+    formats = avfilter_make_all_channel_layouts();
-+    if (!formats)
++    layouts = ff_all_channel_layouts();
++    if (!layouts)
 +        return AVERROR(ENOMEM);
-+    avfilter_set_common_channel_layouts(ctx, formats);
++    ff_set_common_channel_layouts(ctx, layouts);
 +
 +    formats = avfilter_make_format_list(sample_fmts);
 +    if (!formats)
 +        return AVERROR(ENOMEM);
 +    avfilter_set_common_sample_formats(ctx, formats);
 +
-+    formats = avfilter_make_format_list(packing_fmts);
++    formats = ff_all_samplerates();
 +    if (!formats)
 +        return AVERROR(ENOMEM);
-+    avfilter_set_common_packing_formats(ctx, formats);
++    ff_set_common_samplerates(ctx, formats);
 +
 +    return 0;
 +}
@@ -412,7 +404,7 @@ index 0000000..4d953e5
 +        }
 +    }
 +finished:
-+    avfilter_filter_samples(outlink, insamples);
++    ff_filter_samples(outlink, insamples);
 +}
 +
 +    static av_cold void uninit(AVFilterContext *ctx)
@@ -443,23 +435,23 @@ index 0000000..4d953e5
 +                                 { .name = NULL}},
 +};
 diff --git a/ffmpeg/libavfilter/allfilters.c b/ffmpeg/libavfilter/allfilters.c
-index ef99298..157a334 100644
+index b9d44f2..27c2346 100644
 --- a/ffmpeg/libavfilter/allfilters.c
 +++ b/ffmpeg/libavfilter/allfilters.c
-@@ -38,6 +38,7 @@ void avfilter_register_all(void)
-     REGISTER_FILTER (AFORMAT,     aformat,     af);
+@@ -39,6 +39,7 @@ void avfilter_register_all(void)
      REGISTER_FILTER (AMERGE,      amerge,      af);
+     REGISTER_FILTER (AMIX,        amix,        af);
      REGISTER_FILTER (ANULL,       anull,       af);
 +    REGISTER_FILTER (AREDACT,     aredact,     af);
      REGISTER_FILTER (ARESAMPLE,   aresample,   af);
      REGISTER_FILTER (ASHOWINFO,   ashowinfo,   af);
      REGISTER_FILTER (ASPLIT,      asplit,      af);
-@@ -84,6 +85,7 @@ void avfilter_register_all(void)
+@@ -91,6 +92,7 @@ void avfilter_register_all(void)
      REGISTER_FILTER (OVERLAY,     overlay,     vf);
      REGISTER_FILTER (PAD,         pad,         vf);
      REGISTER_FILTER (PIXDESCTEST, pixdesctest, vf);
 +    REGISTER_FILTER (REDACT,      redact,      vf);
-     REGISTER_FILTER (SCALE,       scale,       vf);
+     REGISTER_FILTER (REMOVELOGO,  removelogo,  vf);
      REGISTER_FILTER (SELECT,      select,      vf);
      REGISTER_FILTER (SETDAR,      setdar,      vf);
 diff --git a/ffmpeg/libavfilter/vf_redact.c b/ffmpeg/libavfilter/vf_redact.c
@@ -1108,96 +1100,3 @@ index 0000000..e1e2ff5
 +      .type             = AVMEDIA_TYPE_VIDEO, },
 +    { .name = NULL}},
 +};
-diff --git a/ffmpeg/libavutil/arm/intmath.h b/ffmpeg/libavutil/arm/intmath.h
-index 52af66e..e54458b 100644
---- a/ffmpeg/libavutil/arm/intmath.h
-+++ b/ffmpeg/libavutil/arm/intmath.h
-@@ -75,6 +75,8 @@ static av_always_inline av_const int16_t av_clip_int16_arm(int a)
-     return x;
- }
- 
-+/*
-+ doesn't work with Android NDKr7: http://patches.libav.org/patch/3525/
- #define av_clip_uintp2 av_clip_uintp2_arm
- static av_always_inline av_const unsigned av_clip_uintp2_arm(int a, int p)
- {
-@@ -82,7 +84,7 @@ static av_always_inline av_const unsigned av_clip_uintp2_arm(int a, int p)
-     __asm__ ("usat %0, %2, %1" : "=r"(x) : "r"(a), "i"(p));
-     return x;
- }
--
-+*/
- 
- #else /* HAVE_ARMV6 */
- 
-diff --git a/ffmpeg/redact_unsort.txt b/ffmpeg/redact_unsort.txt
-new file mode 100644
-index 0000000..08f0c4d
---- /dev/null
-+++ b/ffmpeg/redact_unsort.txt
-@@ -0,0 +1,65 @@
-+0.129,2.391,-66,83,16,83,black
-+3.269,3.391,-16,83,-16,83,black
-+3.391,3.408,-16,83,-16,83,black
-+3.408,3.422,-16,83,-16,83,black
-+3.422,3.438,-15,84,-15,84,black
-+3.438,3.453,-15,84,-15,84,black
-+3.453,3.468,-13,86,-13,86,black
-+3.468,3.483,-12,87,-12,87,black
-+3.483,3.498,-11,88,-11,88,black
-+3.498,3.513,-9,90,-9,90,black
-+3.513,3.527,-4,95,-4,95,black
-+3.527,3.544,-1,98,-1,98,black
-+3.544,3.558,2,102,2,102,black
-+3.558,3.574,6,106,6,106,black
-+3.574,3.588,10,110,10,110,black
-+3.588,3.603,14,114,14,114,black
-+3.603,3.62,18,118,18,118,black
-+3.62,3.673,22,122,22,122,black
-+3.673,3.683,30,130,30,130,black
-+3.683,3.693,32,132,32,132,black
-+3.693,3.709,34,134,34,134,black
-+3.709,3.726,35,135,35,135,black
-+3.726,3.743,36,136,36,136,black
-+3.743,3.755,37,137,37,137,black
-+3.755,3.772,39,139,39,139,black
-+3.772,3.784,41,141,41,141,black
-+3.784,3.8,42,142,42,142,black
-+3.8,3.895,44,144,44,144,black
-+3.895,3.896,45,145,45,145,black
-+3.896,3.9,54,154,54,154,black
-+3.9,3.917,56,156,56,156,black
-+3.917,3.932,58,158,58,158,black
-+3.932,3.948,60,160,60,160,black
-+3.948,3.965,62,162,62,162,black
-+3.965,3.978,64,164,64,164,black
-+3.978,3.993,65,165,65,165,black
-+3.993,4.008,67,167,67,167,black
-+4.008,4.022,68,168,68,168,black
-+4.022,4.04,69,169,69,169,black
-+4.04,4.143,71,171,71,171,black
-+4.143,4.155,81,181,81,181,black
-+4.155,4.172,82,182,82,182,black
-+4.172,4.187,83,183,83,183,black
-+4.187,4.231,85,185,85,185,black
-+4.231,4.245,88,188,88,188,black
-+4.245,4.261,89,189,89,189,black
-+4.261,4.277,91,191,91,191,black
-+4.277,4.292,92,192,92,192,black
-+4.292,4.307,94,194,94,194,black
-+4.307,4.322,95,195,95,195,black
-+4.322,4.337,96,196,96,196,black
-+4.337,4.353,97,197,97,197,black
-+4.353,4.368,97,197,97,197,black
-+4.368,4.386,98,198,98,198,black
-+4.386,4.399,98,198,98,198,black
-+4.399,4.416,98,198,98,198,black
-+4.416,4.44,98,198,98,198,black
-+4.44,4.457,98,198,98,198,black
-+4.457,4.49,99,199,99,199,black
-+4.49,4.575,99,199,99,199,black
-+4.575,4.589,99,199,99,199,black
-+4.589,4.682,99,199,99,199,black
-+4.682,4.711,99,199,99,199,black
-+4.711,4.749,99,199,99,199,black
-+4.749,5.749,149,149,46,46,black
