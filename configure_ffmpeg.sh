@@ -12,6 +12,7 @@ fi
 # the files being patched have changed, in which cause a partial application
 # could happen unnoticed.
 patch -N -p1 --reject-file=- < redact-plugins.patch
+patch -N -p1 --reject-file=- < arm-asm-fix.patch
 
 pushd ffmpeg
 
@@ -25,7 +26,6 @@ pushd ffmpeg
 
 ./configure \
 $DEBUG_FLAG \
---enable-cross-compile \
 --arch=arm \
 --cpu=cortex-a8 \
 --target-os=linux \
@@ -120,7 +120,7 @@ $DEBUG_FLAG \
 --disable-network \
 --enable-libx264 \
 --enable-zlib \
---extra-cflags="-I../x264" \
+--extra-cflags="-I../x264 -mfloat-abi=softfp -mfpu=neon" \
 --extra-ldflags="-L../x264"
 
 popd; popd
