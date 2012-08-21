@@ -75,9 +75,7 @@ $DEBUG_FLAG \
 --enable-libx264 \
 --enable-zlib \
 --extra-cflags="-I../x264" \
---extra-ldflags="-L../x264" \
---disable-avdevice \
---disable-devices
+--extra-ldflags="-L../x264"
 
 popd; popd
 
