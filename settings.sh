@@ -12,9 +12,10 @@ NDK_ABI=arm
 NDK_COMPILER_VERSION=4.6
 NDK_SYSROOT=$NDK_BASE/platforms/android-$NDK_PLATFORM_VERSION/arch-$NDK_ABI
 NDK_UNAME=`uname -s | tr '[A-Z]' '[a-z]'`
-NDK_TOOLCHAIN_BASE=$NDK_BASE/toolchains/$NDK_ABI-linux-androideabi-$NDK_COMPILER_VERSION/prebuilt/$NDK_UNAME-x86
-CC="$NDK_TOOLCHAIN_BASE/bin/$NDK_ABI-linux-androideabi-gcc --sysroot=$NDK_SYSROOT"
-LD=$NDK_TOOLCHAIN_BASE/bin/$BDK_ABI-linux-androideabi-ld
+HOST=$NDK_ABI-linux-androideabi
+NDK_TOOLCHAIN_BASE=$NDK_BASE/toolchains/$HOST-$NDK_COMPILER_VERSION/prebuilt/$NDK_UNAME-x86
+CC="$NDK_TOOLCHAIN_BASE/bin/$HOST-gcc --sysroot=$NDK_SYSROOT"
+LD=$NDK_TOOLCHAIN_BASE/bin/$HOST-ld
 
 # i use only a small number of formats - set this to 0 if you want everything.
 # changed 0 to the default, so it'll compile shitloads of codecs normally
