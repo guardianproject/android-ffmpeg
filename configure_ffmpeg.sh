@@ -16,14 +16,6 @@ patch -N -p1 --reject-file=- < arm-asm-fix.patch
 
 pushd ffmpeg
 
-#--disable-decoders \
-#--disable-encoders \
-#--disable-muxers \
-#--disable-demuxers \
-#--disable-parsers \
-#--disable-filters \
-#--disable-protocols \
-
 ./configure \
 $DEBUG_FLAG \
 --arch=arm \
@@ -37,8 +29,12 @@ $DEBUG_FLAG \
 --enable-small \
 --cross-prefix=$NDK_TOOLCHAIN_BASE/bin/$NDK_ABI-linux-androideabi- \
 --sysroot="$NDK_SYSROOT" \
+--extra-cflags="-I../x264 -mfloat-abi=softfp -mfpu=neon" \
+--extra-ldflags="-L../x264" \
+\
 --enable-version3 \
 --enable-gpl \
+\
 --enable-memalign-hack \
 --disable-doc \
 --enable-yasm \
@@ -118,10 +114,9 @@ $DEBUG_FLAG \
 --disable-ffprobe \
 --disable-ffserver \
 --disable-network \
+\
 --enable-libx264 \
---enable-zlib \
---extra-cflags="-I../x264 -mfloat-abi=softfp -mfpu=neon" \
---extra-ldflags="-L../x264"
+--enable-zlib
 
 popd; popd
 
