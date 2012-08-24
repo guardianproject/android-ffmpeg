@@ -92,19 +92,7 @@ $DEBUG_FLAG \
 --enable-protocol=md5 \
 --enable-protocol=pipe \
 \
---disable-filters \
---enable-filter=amerge \
---enable-filter=amix \
---enable-filter=anull \
---enable-filter=aredact \
---enable-filter=aresample \
---enable-filter=resample \
---enable-filter=volume \
---enable-filter=buffersink \
---enable-filter=drawbox \
---enable-filter=null \
---enable-filter=overlay \
---enable-filter=redact \
+--enable-filters \
 \
 --disable-bsfs \
 \
