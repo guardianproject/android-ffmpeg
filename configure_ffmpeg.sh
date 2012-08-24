@@ -30,7 +30,6 @@ $DEBUG_FLAG \
 --enable-pic \
 --disable-shared \
 --enable-static \
---enable-small \
 --cross-prefix=$NDK_TOOLCHAIN_BASE/bin/$NDK_ABI-linux-androideabi- \
 --sysroot="$NDK_SYSROOT" \
 --extra-cflags="-I../x264 -mfloat-abi=softfp -mfpu=neon" \
@@ -39,7 +38,6 @@ $DEBUG_FLAG \
 --enable-version3 \
 --enable-gpl \
 \
---enable-memalign-hack \
 --disable-doc \
 --enable-yasm \
 \
