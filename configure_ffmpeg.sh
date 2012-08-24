@@ -13,6 +13,10 @@ fi
 # could happen unnoticed.
 patch -N -p1 --reject-file=- < redact-plugins.patch
 patch -N -p1 --reject-file=- < arm-asm-fix.patch
+patch -d ffmpeg -N -p1 --reject-file=- < \
+    ARM_generate_position_independent_code_to_access_data_symbols.patch
+patch -d ffmpeg -N -p1 --reject-file=- < \
+    ARM_intmath_use_native-size_return_types_for_clipping_functions.patch
 
 pushd ffmpeg
 

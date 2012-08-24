@@ -1,0 +1,226 @@
+commit 62634158b7cd39ad1e330a87153a97bf3dc6f8de
+Author: Mans Rullgard <mans@mansr.com>
+Date:   Fri Jun 29 13:35:08 2012 +0100
+
+    ARM: generate position independent code to access data symbols
+    
+    This creates proper position independent code when accessing
+    data symbols if CONFIG_PIC is set.
+    
+    References to external symbols should now use the movrelx macro.
+    Some additional code changes are required since this macro may
+    need a register to hold the GOT pointer.
+    
+    Signed-off-by: Mans Rullgard <mans@mansr.com>
+
+diff --git a/libavcodec/arm/ac3dsp_armv6.S b/libavcodec/arm/ac3dsp_armv6.S
+index 7e2f40e..f6f297a 100644
+--- a/libavcodec/arm/ac3dsp_armv6.S
++++ b/libavcodec/arm/ac3dsp_armv6.S
+@@ -26,8 +26,8 @@ function ff_ac3_bit_alloc_calc_bap_armv6, export=1
+         beq             4f
+         push            {r4-r11,lr}
+         add             r5,  sp,  #40
+-        movrel          r4,  X(ff_ac3_bin_to_band_tab)
+-        movrel          lr,  X(ff_ac3_band_start_tab)
++        movrelx         r4,  X(ff_ac3_bin_to_band_tab), r11
++        movrelx         lr,  X(ff_ac3_band_start_tab)
+         ldm             r5,  {r5-r7}
+         ldrb            r4,  [r4, r2]
+         add             r1,  r1,  r2,  lsl #1           @ psd + start
+diff --git a/libavcodec/arm/fft_fixed_neon.S b/libavcodec/arm/fft_fixed_neon.S
+index 4d891ba..faddc00 100644
+--- a/libavcodec/arm/fft_fixed_neon.S
++++ b/libavcodec/arm/fft_fixed_neon.S
+@@ -214,7 +214,7 @@ function fft\n\()_neon
+         bl              fft\n4\()_neon
+         mov             r0,  r4
+         pop             {r4, lr}
+-        movrel          r1,  X(ff_cos_\n\()_fixed)
++        movrelx         r1,  X(ff_cos_\n\()_fixed)
+         mov             r2,  #\n4/2
+         b               fft_pass_neon
+ endfunc
+diff --git a/libavcodec/arm/fft_neon.S b/libavcodec/arm/fft_neon.S
+index aa06e6d..c4d8918 100644
+--- a/libavcodec/arm/fft_neon.S
++++ b/libavcodec/arm/fft_neon.S
+@@ -143,7 +143,7 @@ function fft16_neon
+         vswp            d29, d30                @ q14{r12,i12,i14,r15} q15{r13,i13,i15,r14}
+         vadd.f32        q0,  q12, q13           @ {t1,t2,t5,t6}
+         vadd.f32        q1,  q14, q15           @ {t1a,t2a,t5a,t6a}
+-        movrel          r2,  X(ff_cos_16)
++        movrelx         r2,  X(ff_cos_16)
+         vsub.f32        q13, q12, q13           @ {t3,t4,t7,t8}
+         vrev64.32       d1,  d1
+         vsub.f32        q15, q14, q15           @ {t3a,t4a,t7a,t8a}
+@@ -290,7 +290,7 @@ function fft\n\()_neon
+         bl              fft\n4\()_neon
+         mov             r0,  r4
+         pop             {r4, lr}
+-        movrel          r1,  X(ff_cos_\n)
++        movrelx         r1,  X(ff_cos_\n)
+         mov             r2,  #\n4/2
+         b               fft_pass_neon
+ endfunc
+diff --git a/libavcodec/arm/sbrdsp_neon.S b/libavcodec/arm/sbrdsp_neon.S
+index 4b681bf..610397f 100644
+--- a/libavcodec/arm/sbrdsp_neon.S
++++ b/libavcodec/arm/sbrdsp_neon.S
+@@ -307,8 +307,8 @@ function ff_sbr_hf_apply_noise_0_neon, export=1
+         vmov.i32        d3,  #0
+ .Lhf_apply_noise_0:
+         push            {r4,lr}
++        movrelx         r4,  X(ff_sbr_noise_table)
+         ldr             r12, [sp, #12]
+-        movrel          r4,  X(ff_sbr_noise_table)
+         add             r3,  r3,  #1
+         bfc             r3,  #9,  #23
+         sub             r12, r12, #1
+@@ -355,8 +355,8 @@ function ff_sbr_hf_apply_noise_1_neon, export=1
+         eor             lr,  r12, #1<<31
+         vmov            d3,  r12, lr
+ .Lhf_apply_noise_1:
++        movrelx         r4,  X(ff_sbr_noise_table)
+         ldr             r12, [sp, #12]
+-        movrel          r4,  X(ff_sbr_noise_table)
+         add             r3,  r3,  #1
+         bfc             r3,  #9,  #23
+         sub             r12, r12, #1
+diff --git a/libavcodec/arm/vp3dsp_neon.S b/libavcodec/arm/vp3dsp_neon.S
+index 8d22d00..2a9b25f 100644
+--- a/libavcodec/arm/vp3dsp_neon.S
++++ b/libavcodec/arm/vp3dsp_neon.S
+@@ -116,9 +116,8 @@ function vp3_idct_start_neon
+     vadd.s16        q1,  q8,  q12
+     vsub.s16        q8,  q8,  q12
+     vld1.64         {d28-d31}, [r2,:128]!
+-endfunc
+ 
+-function vp3_idct_core_neon
++vp3_idct_core_neon:
+     vmull.s16       q2,  d18, xC1S7     // (ip[1] * C1) << 16
+     vmull.s16       q3,  d19, xC1S7
+     vmull.s16       q4,  d2,  xC4S4     // ((ip[0] + ip[4]) * C4) << 16
+diff --git a/libavcodec/arm/vp8_armv6.S b/libavcodec/arm/vp8_armv6.S
+index 1fa6d15..1b668bc 100644
+--- a/libavcodec/arm/vp8_armv6.S
++++ b/libavcodec/arm/vp8_armv6.S
+@@ -65,7 +65,7 @@ T       orrcs           \cw, \cw, \t1
+ 
+ function ff_decode_block_coeffs_armv6, export=1
+         push            {r0,r1,r4-r11,lr}
+-        movrel          lr,  X(ff_vp56_norm_shift)
++        movrelx         lr,  X(ff_vp56_norm_shift)
+         ldrd            r4,  r5,  [sp, #44]             @ token_prob, qmul
+         cmp             r3,  #0
+         ldr             r11, [r5]
+@@ -206,7 +206,7 @@ A       orrcs           r8,  r8,  r10, lsl r6
+         mov             r9,  #8
+         it              ge
+         addge           r12, r12, #1
+-        movrel          r4,  X(ff_vp8_dct_cat_prob)
++        movrelx         r4,  X(ff_vp8_dct_cat_prob), r1
+         lsl             r9,  r9,  r12
+         ldr             r4,  [r4, r12, lsl #2]
+         add             r12, r9,  #3
+diff --git a/libavcodec/arm/asm.S b/libavcodec/arm/asm.S
+index 6038a63..1508180 100644
+--- a/libavcodec/arm/asm.S
++++ b/libavcodec/arm/asm.S
+@@ -62,7 +62,14 @@ ELF     .eabi_attribute 25, \val
+ .endm
+ 
+ .macro  function name, export=0
++        .set            .Lpic_idx, 0
++        .set            .Lpic_gp, 0
+     .macro endfunc
++      .if .Lpic_idx
++        .altmacro
++        put_pic         %(.Lpic_idx - 1)
++        .noaltmacro
++      .endif
+ ELF     .size   \name, . - \name
+         .endfunc
+         .purgem endfunc
+@@ -106,8 +113,44 @@ ELF     .size   \name, . - \name
+ #endif
+ .endm
+ 
++.macro  put_pic         num
++        put_pic_\num
++.endm
++
++.macro  do_def_pic      num, val, label
++    .macro put_pic_\num
++      .if \num
++        .altmacro
++        put_pic         %(\num - 1)
++        .noaltmacro
++      .endif
++\label: .word           \val
++        .purgem         put_pic_\num
++    .endm
++.endm
++
++.macro  def_pic         val, label
++        .altmacro
++        do_def_pic      %.Lpic_idx, \val, \label
++        .noaltmacro
++        .set            .Lpic_idx, .Lpic_idx + 1
++.endm
++
++.macro  ldpic           rd,  val, indir=0
++        ldr             \rd, .Lpicoff\@
++.Lpic\@:
++    .if \indir
++        ldr             \rd, [pc, \rd]
++    .else
++        add             \rd, pc,  \rd
++    .endif
++        def_pic         \val - (.Lpic\@ + (8 >> CONFIG_THUMB)), .Lpicoff\@
++.endm
++
+ .macro  movrel rd, val
+-#if HAVE_ARMV6T2 && !CONFIG_PIC && !defined(__APPLE__)
++#if CONFIG_PIC
++        ldpic           \rd, \val
++#elif HAVE_ARMV6T2 && !defined(__APPLE__)
+         movw            \rd, #:lower16:\val
+         movt            \rd, #:upper16:\val
+ #else
+@@ -115,6 +158,34 @@ ELF     .size   \name, . - \name
+ #endif
+ .endm
+ 
++.macro  movrelx         rd,  val, gp
++#if CONFIG_PIC && defined(__ELF__)
++    .ifnb \gp
++      .if .Lpic_gp
++        .unreq          gp
++      .endif
++        gp      .req    \gp
++        ldpic           gp,  _GLOBAL_OFFSET_TABLE_
++    .elseif !.Lpic_gp
++        gp      .req    r12
++        ldpic           gp,  _GLOBAL_OFFSET_TABLE_
++    .endif
++        .set            .Lpic_gp, 1
++        ldr             \rd, .Lpicoff\@
++        ldr             \rd, [gp, \rd]
++        def_pic         \val(GOT), .Lpicoff\@
++#elif CONFIG_PIC && defined(__APPLE__)
++        ldpic           \rd, .Lpic\@, indir=1
++        .non_lazy_symbol_pointer
++.Lpic\@:
++        .indirect_symbol \val
++        .word           0
++        .text
++#else
++        movrel          \rd, \val
++#endif
++.endm
++
+ .macro  ldr_pre         rt,  rn,  rm:vararg
+ A       ldr             \rt, [\rn, \rm]!
+ T       add             \rn, \rn, \rm
