@@ -4,3 +4,6 @@
 [submodule "x264"]
 	path = x264
 	url = git://git.videolan.org/x264.git
+[submodule "freetype2"]
+	path = freetype2
+	url = git://git.sv.gnu.org/freetype/freetype2.git
