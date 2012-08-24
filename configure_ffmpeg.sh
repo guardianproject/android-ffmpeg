@@ -47,7 +47,11 @@ $DEBUG_FLAG \
 --enable-decoder=amrwb \
 --enable-decoder=h264 \
 --enable-decoder=mjpeg \
---enable-decoder=rawvideo \
+--enable-decoder=mpeg2video \
+--enable-decoder=mpeg4 \
+--enable-decoder=pcm_f32le \
+--enable-decoder=pcm_s16le \
+--enable-decoder=pcm_u16le \
 \
 --disable-encoders \
 --enable-encoder=aac \
@@ -93,8 +97,7 @@ $DEBUG_FLAG \
 --enable-protocol=pipe \
 \
 --enable-filters \
-\
---disable-bsfs \
+--enable-avresample \
 \
 --disable-indevs \
 --enable-indev=lavfi \
