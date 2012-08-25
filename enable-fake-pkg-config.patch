@@ -1,0 +1,16 @@
+diff --git a/configure b/configure
+index 4e1a611..34c6d27 100755
+--- a/configure
++++ b/configure
+@@ -2106,6 +2106,11 @@ set_default cc cxx nm pkg_config strip sysinclude yasmexe
+ enabled cross_compile || host_cc_default=$cc
+ set_default host_cc
+ 
++# hack because the Android NDK does not provide pkg-config, and ffmpeg
++# requires pkg-config for configuring when building against external
++# libraries.
++pkg_config=../fake-pkg-config
++
+ if ! $pkg_config --version >/dev/null 2>&1; then
+     warn "$pkg_config not found, library detection may fail."
+     pkg_config=false

@@ -8,7 +8,7 @@ setup
 -----
 
  1. Install the Android NDK r8 or newer
- 2. On Debian/Ubuntu, run: apt-get install yasm bash patch make
+ 2. On Debian/Ubuntu, run: apt-get install yasm bash patch make gawk
 
 
 building
@@ -73,3 +73,15 @@ testing
     -acodec copy \
     -vcodec libx264 -b:v 1000k -an -f mp4 \
     -y /tmp/output.mp4
+
+# drawtext test
+./ffmpeg \
+    -i test.mp4 \
+    -fflags +genpts -t 600 -r 8 -s 640x480 \
+    -vf drawtext="fontfile=DejaVuSans.ttf:x=70:y=455: \
+text='\%H\:\%M\:\%S | \%a \%d/\%b/\%Y | S500ATV | camera 0': \
+fontcolor=0xFFFFFFFF:fontsize=18: \
+shadowcolor=0x000000EE:shadowx=1:shadowy=1" \
+    -b:v 1500000 -r 8 \
+    -acodec copy \
+    -y video_file.mp4

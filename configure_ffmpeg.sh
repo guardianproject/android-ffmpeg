@@ -17,6 +17,8 @@ patch -d ffmpeg -N -p1 --reject-file=- < \
     ARM_generate_position_independent_code_to_access_data_symbols.patch
 patch -d ffmpeg -N -p1 --reject-file=- < \
     ARM_intmath_use_native-size_return_types_for_clipping_functions.patch
+patch -d ffmpeg -N -p1 --reject-file=- < \
+    enable-fake-pkg-config.patch
 
 pushd ffmpeg
 
@@ -98,6 +100,7 @@ $DEBUG_FLAG \
 \
 --enable-filters \
 --enable-avresample \
+--enable-libfreetype \
 \
 --disable-indevs \
 --enable-indev=lavfi \

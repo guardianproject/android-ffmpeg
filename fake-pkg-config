@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# this is a fake pkg-config since ffmpeg requires pkg-config if you want to
+# include external libraries like libfreetype or libass.  The Android NDK does
+# not provide any kind of pkg-config.
+
+case $1 in
+    --exists)
+        if [ $2 = "freetype2" ]; then
+            return 0
+        else
+            return 1
+        fi
+        ;;
+    --cflags)
+        echo "-I../freetype2/include"
+        ;;
+    --libs)
+        echo "-L../freetype2/objs/.libs -lfreetype"
+        ;;
+    *)
+        echo "fake pkg-config for Android NDK build!"
+        ;;
+esac
