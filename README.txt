@@ -9,6 +9,11 @@ setup
 
  1. Install the Android NDK r8 or newer
  2. On Debian/Ubuntu, run: apt-get install yasm bash patch make gawk
+    (If you are on older releases of Debian/Ubuntu/Mint, like Debian/squeeze,
+    then you will need to get newer versions of the packages automake,
+    autotools-dev, and libtool.  You can download these from testing and
+    manually install them. These are needed to provide the newest version
+    of config.guess and config.sub, which only recently got Android support)
 
 
 building
