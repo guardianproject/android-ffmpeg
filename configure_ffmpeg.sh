@@ -45,8 +45,10 @@ $DEBUG_FLAG \
 \
 --disable-decoders \
 --enable-decoder=aac \
+--enable-decoder=aac_latm \
 --enable-decoder=amrnb \
 --enable-decoder=amrwb \
+--enable-decoder=h263 \
 --enable-decoder=h264 \
 --enable-decoder=mjpeg \
 --enable-decoder=mpeg2video \
@@ -65,6 +67,7 @@ $DEBUG_FLAG \
 --enable-encoder=pcm_u16le \
 \
 --disable-muxers \
+--enable-muxer=amr \
 --enable-muxer=mp4 \
 --enable-muxer=matroska \
 --enable-muxer=matroska_audio \
@@ -75,7 +78,10 @@ $DEBUG_FLAG \
 --disable-demuxers \
 --enable-demuxer=aac \
 --enable-demuxer=amr \
+--enable-demuxer=h263 \
+--enable-demuxer=h264 \
 --enable-demuxer=image2 \
+--enable-demuxer=matroska \
 --enable-demuxer=mjpeg \
 --enable-demuxer=mp3 \
 --enable-demuxer=mp4 \
@@ -85,6 +91,7 @@ $DEBUG_FLAG \
 --disable-parsers \
 --enable-parser=aac \
 --enable-parser=aac_latm \
+--enable-parser=h263 \
 --enable-parser=h264 \
 --enable-parser=mjpeg \
 --enable-parser=mpeg4video \
