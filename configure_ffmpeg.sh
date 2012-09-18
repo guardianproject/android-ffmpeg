@@ -51,6 +51,8 @@ $DEBUG_FLAG \
 --enable-decoder=h263 \
 --enable-decoder=h264 \
 --enable-decoder=mjpeg \
+--enable-decoder=mp2 \
+--enable-decoder=mpeg1video \
 --enable-decoder=mpeg2video \
 --enable-decoder=mpeg4 \
 --enable-decoder=pcm_f32le \
@@ -60,6 +62,8 @@ $DEBUG_FLAG \
 --disable-encoders \
 --enable-encoder=aac \
 --enable-encoder=libx264 \
+--enable-encoder=mp2 \
+--enable-encoder=mpeg1video \
 --enable-encoder=mpeg2video \
 --enable-encoder=mpeg4 \
 --enable-encoder=pcm_f32le \
@@ -71,6 +75,8 @@ $DEBUG_FLAG \
 --enable-muxer=mp4 \
 --enable-muxer=matroska \
 --enable-muxer=matroska_audio \
+--enable-muxer=mp2 \
+--enable-muxer=mpeg1system \
 --enable-muxer=mpeg2video \
 --enable-muxer=mpegts \
 --enable-muxer=yuv4mpegpipe \
@@ -83,6 +89,7 @@ $DEBUG_FLAG \
 --enable-demuxer=image2 \
 --enable-demuxer=matroska \
 --enable-demuxer=mjpeg \
+--enable-demuxer=mpegvideo \
 --enable-demuxer=mp3 \
 --enable-demuxer=mp4 \
 --enable-demuxer=mov \
