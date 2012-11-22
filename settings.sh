@@ -27,3 +27,13 @@ function current_dir {
   echo "$(cd "$(dirname $0)"; pwd)"
 }
 
+CWD=`pwd`
+PROJECT_ROOT=$CWD
+EXTERNAL_ROOT=$PROJECT_ROOT
+
+# install root for built files
+DESTDIR=$EXTERNAL_ROOT
+prefix=/data/data/info.guardianproject.ffmpeg/app_opt
+LOCAL=$DESTDIR$prefix
+
+
