@@ -22,6 +22,7 @@ export FFMPEG_LIBS
 ./configure \
         CC="$CC" \
         LD="$LD" \
+        STRIP="$STRIP" \
         --host=$HOST \
         --with-sysroot="$NDK_SYSROOT" \
         --enable-static \
