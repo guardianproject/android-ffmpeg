@@ -11,3 +11,5 @@ function die {
 ./make_freetype2.sh || die "freetype2 make"
 ./configure_ffmpeg.sh || die "FFMPEG configure"
 ./make_ffmpeg.sh || die "FFMPEG make"
+./configure_sox.sh || die "SoX configure"
+./make_sox.sh || die "SoX make"

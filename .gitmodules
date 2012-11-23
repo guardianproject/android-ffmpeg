@@ -7,3 +7,6 @@
 [submodule "freetype2"]
 	path = freetype2
 	url = git://git.sv.gnu.org/freetype/freetype2.git
+[submodule "sox"]
+	path = sox
+	url = git://sox.git.sourceforge.net/gitroot/sox/sox

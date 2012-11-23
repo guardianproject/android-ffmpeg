@@ -14,6 +14,7 @@ NDK_SYSROOT=$NDK_BASE/platforms/android-$NDK_PLATFORM_VERSION/arch-$NDK_ABI
 NDK_UNAME=`uname -s | tr '[A-Z]' '[a-z]'`
 HOST=$NDK_ABI-linux-androideabi
 NDK_TOOLCHAIN_BASE=$NDK_BASE/toolchains/$HOST-$NDK_COMPILER_VERSION/prebuilt/$NDK_UNAME-x86
+STRIP=$NDK_TOOLCHAIN_BASE/bin/$NDK_ABI-linux-androideabi-strip
 CC="$NDK_TOOLCHAIN_BASE/bin/$HOST-gcc --sysroot=$NDK_SYSROOT"
 LD=$NDK_TOOLCHAIN_BASE/bin/$HOST-ld
 
@@ -26,4 +27,14 @@ fi
 function current_dir {
   echo "$(cd "$(dirname $0)"; pwd)"
 }
+
+CWD=`pwd`
+PROJECT_ROOT=$CWD
+EXTERNAL_ROOT=$PROJECT_ROOT
+
+# install root for built files
+DESTDIR=$EXTERNAL_ROOT
+prefix=/data/data/info.guardianproject.ffmpeg/app_opt
+LOCAL=$DESTDIR$prefix
+
 
