@@ -1,0 +1,106 @@
+From 7f92e1991f9cb34110a054713c8c848ef791b26b Mon Sep 17 00:00:00 2001
+From: Abel Luck <abel@guardianproject.info>
+Date: Thu, 22 Nov 2012 11:57:29 -0500
+Subject: [PATCH] Update to new FFMPEG API
+
+---
+ m4/ffmpeg.m4 |  2 +-
+ src/ffmpeg.c | 21 +++++++--------------
+ 2 files changed, 8 insertions(+), 15 deletions(-)
+
+diff --git a/m4/ffmpeg.m4 b/m4/ffmpeg.m4
+index 11c8623..40e5ac4 100644
+--- a/m4/ffmpeg.m4
++++ b/m4/ffmpeg.m4
+@@ -49,7 +49,7 @@ then
+   LIBS="$LIBS $FFMPEG_LIBS"
+   have_ffmpeg="no"
+   AC_CHECK_HEADERS([libavformat/avformat.h ffmpeg/avformat.h],
+-    [AC_CHECK_LIB(avformat, av_open_input_file,
++    [AC_CHECK_LIB(avformat, avformat_open_input,
+       [AC_CHECK_HEADERS([libavcodec/avcodec.h ffmpeg/avcodec.h],
+         [AC_CHECK_LIB(avcodec, avcodec_decode_audio3, have_ffmpeg=yes)])])
+     break])
+diff --git a/src/ffmpeg.c b/src/ffmpeg.c
+index 09bfc26..0e0267f 100644
+--- a/src/ffmpeg.c
++++ b/src/ffmpeg.c
+@@ -93,7 +93,7 @@ static int stream_component_open(priv_t * ffmpeg, int stream_index)
+ #if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
+   enc->error_resilience = 1;
+ #else
+-  enc->error_recognition = 1;
++  enc->err_recognition = 1;
+ #endif
+ 
+   if (!codec || avcodec_open(enc, codec) < 0)
+@@ -157,7 +157,7 @@ static int audio_decode_frame(priv_t * ffmpeg, uint8_t *audio_buf, int buf_size)
+ static int startread(sox_format_t * ft)
+ {
+   priv_t * ffmpeg = (priv_t *)ft->priv;
+-  AVFormatParameters params;
++  AVDictionary *params;
+   int ret;
+   int i;
+ 
+@@ -172,7 +172,7 @@ static int startread(sox_format_t * ft)
+ 
+   /* Open file and get format */
+   memset(&params, 0, sizeof(params));
+-  if ((ret = av_open_input_file(&ffmpeg->ctxt, ft->filename, NULL, 0, &params)) < 0) {
++  if ((ret = avformat_open_input(&ffmpeg->ctxt, ft->filename, NULL, &params)) < 0) {
+     lsx_fail("ffmpeg cannot open file for reading: %s (code %d)", ft->filename, ret);
+     return SOX_EOF;
+   }
+@@ -231,7 +231,7 @@ static size_t read_samples(sox_format_t * ft, sox_sample_t *buf, size_t len)
+     /* If input buffer empty, read more data */
+     if (ffmpeg->audio_buf_index * 2 >= ffmpeg->audio_buf_size) {
+       if ((ret = av_read_frame(ffmpeg->ctxt, pkt)) < 0 &&
+-	  (ret == AVERROR_EOF || url_ferror(ffmpeg->ctxt->pb)))
++	  (ret == AVERROR_EOF || ffmpeg->ctxt->pb->error))
+ 	break;
+       ffmpeg->audio_buf_size = audio_decode_frame(ffmpeg, ffmpeg->audio_buf_aligned, AVCODEC_MAX_AUDIO_FRAME_SIZE);
+       ffmpeg->audio_buf_index = 0;
+@@ -373,13 +373,6 @@ static int startwrite(sox_format_t * ft)
+       return SOX_EOF;
+   }
+ 
+-  /* set the output parameters (must be done even if no
+-     parameters). */
+-  if (av_set_parameters(ffmpeg->ctxt, NULL) < 0) {
+-    lsx_fail("ffmpeg invalid output format parameters");
+-    return SOX_EOF;
+-  }
+-
+   /* Next line for debugging */
+   /* dump_format(ffmpeg->ctxt, 0, ft->filename, 1); */
+ 
+@@ -391,14 +384,14 @@ static int startwrite(sox_format_t * ft)
+ 
+   /* open the output file, if needed */
+   if (!(ffmpeg->fmt->flags & AVFMT_NOFILE)) {
+-    if (url_fopen(&ffmpeg->ctxt->pb, ft->filename, URL_WRONLY) < 0) {
++    if (avio_open(&ffmpeg->ctxt->pb, ft->filename, AVIO_FLAG_WRITE) < 0) {
+       lsx_fail("ffmpeg could not open `%s'", ft->filename);
+       return SOX_EOF;
+     }
+   }
+ 
+   /* write the stream header, if any */
+-  av_write_header(ffmpeg->ctxt);
++  avformat_write_header(ffmpeg->ctxt, NULL);
+ 
+   return SOX_SUCCESS;
+ }
+@@ -478,7 +471,7 @@ static int stopwrite(sox_format_t * ft)
+ #if (LIBAVFORMAT_VERSION_INT < 0x340000)
+     url_fclose(&ffmpeg->ctxt->pb);
+ #else
+-    url_fclose(ffmpeg->ctxt->pb);
++    avio_close(ffmpeg->ctxt->pb);
+ #endif
+   }
+ 
+-- 
+1.7.11.7
+

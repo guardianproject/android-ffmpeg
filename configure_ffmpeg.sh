@@ -28,7 +28,7 @@ $DEBUG_FLAG \
 --cpu=cortex-a8 \
 --target-os=linux \
 --enable-runtime-cpudetect \
---prefix=/data/data/org.witness.sscvideoproto \
+--prefix=$prefix \
 --enable-pic \
 --disable-shared \
 --enable-static \
