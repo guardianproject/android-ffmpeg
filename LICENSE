@@ -1,0 +1,23 @@
+This project is a bundle of various other projects and a few patches.
+
+Each project has is own license, and any patches to them are under the original
+license.
+
+Any source code not covered by a project license is GPLv3.
+
+FFMPEG: LGPL v2.1 3, GPLv2+ 3
+    ffmpeg/COPYING.LGPLv2.1
+    ffmpeg/COPYING.LGPLv3
+    ffmpeg/COPYING.GPLv2
+    ffmpeg/COPYING.GPLv3
+
+freetype2: Freetype license, GPLv2
+    freetype2/docs/GPLv2.TXT
+    freetype2/docs/FTL.TXT
+
+x264: GPLv2
+    x264/COPYING
+
+sox: GPLv 2, LGPL v2.1
+    sox/LICENSE.GPL
+    sox/LICENSE.LGPL
