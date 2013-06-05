@@ -28,6 +28,18 @@ That should give you command line binary ffmpeg/ffmpeg, which is the only file
 you should need.
 
 
+Note: the 'make' build is setup to work with the Android NDK r8e. If you are
+using an older version, or you are using the 32-bit NDK on a 64-bit system,
+then you might need to set some variables manually as part of the command
+line.  For example, using the 32-bit NDK on a 64-bit system:
+
+    NDK_PROCESSOR=x86 ./configure_make_everything.sh
+
+ Or using an older compiler version:
+
+    NDK_COMPILER_VERSION=4.4.3 ./configure_make_everything.sh
+
+
 customizing
 -----------
 
