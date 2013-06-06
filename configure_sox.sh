@@ -28,8 +28,7 @@ export FFMPEG_LIBS
         --enable-static \
         --disable-shared \
         --with-ffmpeg \
-        --without-libltdl \
-        --without-bzip2
+        --without-libltdl
 
 
 popd; popd
