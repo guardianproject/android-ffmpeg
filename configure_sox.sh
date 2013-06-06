@@ -9,18 +9,12 @@ fi
 
 pushd sox
 patch -N -p1 --reject-file=- < ../sox-update-ffmpeg-api.patch
-autoreconf -i
+autoreconf --install --force --verbose
 
-PKG_CONFIG=../fake-pkg-config
-PKG_CONFIG_LIBDIR="$LOCAL/lib/pkgconfig"
-FFMPEG_LDFLAGS="-L$LOCAL/lib -L$DESTDIR/x264"
-FFMPEG_LIBS="-lavformat -lavcodec -lavutil -lz -lx264"
-FFMPEG_CFLAGS="-I$LOCAL/include"
-export PKG_CONFIG
-export PKG_CONFIG_LIBDIR
-export FFMPEG_CFLAGS
-export FFMPEG_LIBS
 ./configure \
+        CFLAGS="-I$LOCAL/include" \
+        LDFLAGS="-L$LOCAL/lib -L$DESTDIR/x264" \
+        LIBS="-lavformat -lavcodec -lavutil -lz -lx264" \
         CC="$CC" \
         LD="$LD" \
         STRIP="$STRIP" \
