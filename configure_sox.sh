@@ -13,7 +13,8 @@ autoreconf -i
 
 PKG_CONFIG=../fake-pkg-config
 PKG_CONFIG_LIBDIR="$LOCAL/lib/pkgconfig"
-FFMPEG_LIBS="-L$LOCAL/lib -lavformat -lavcodec -lavutil -lz -L$DESTDIR/x264 -lx264"
+FFMPEG_LDFLAGS="-L$LOCAL/lib -L$DESTDIR/x264"
+FFMPEG_LIBS="-lavformat -lavcodec -lavutil -lz -lx264"
 FFMPEG_CFLAGS="-I$LOCAL/include"
 export PKG_CONFIG
 export PKG_CONFIG_LIBDIR
