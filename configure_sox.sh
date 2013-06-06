@@ -8,7 +8,7 @@ if [[ $DEBUG == 1 ]]; then
 fi
 
 pushd sox
-git apply ../sox-update-ffmpeg-api.patch
+patch -N -p1 --reject-file=- < ../sox-update-ffmpeg-api.patch
 autoreconf -i
 
 PKG_CONFIG=../fake-pkg-config
