@@ -34,8 +34,8 @@ $DEBUG_FLAG \
 --enable-static \
 --cross-prefix=$NDK_TOOLCHAIN_BASE/bin/$NDK_ABI-linux-androideabi- \
 --sysroot="$NDK_SYSROOT" \
---extra-cflags="-I../x264 -mfloat-abi=softfp -mfpu=neon" \
---extra-ldflags="-L../x264" \
+--extra-cflags="-I../x264 -mfloat-abi=softfp -mfpu=neon -fPIE -pie" \
+--extra-ldflags="-L../x264 -fPIE -pie" \
 \
 --enable-version3 \
 --enable-gpl \

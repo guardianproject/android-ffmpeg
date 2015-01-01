@@ -9,6 +9,8 @@ pushd x264
 --host=arm-linux \
 --enable-pic \
 --enable-static \
+--extra-cflags="-fPIE -pie" \
+--extra-ldflags="-fPIE -pie" \
 --disable-cli
 
 popd;popd
