@@ -12,8 +12,8 @@ patch -N -p1 --reject-file=- < ../sox-update-ffmpeg-api.patch
 autoreconf --install --force --verbose
 
 ./configure \
-        CFLAGS="-I$LOCAL/include" \
-        LDFLAGS="-L$LOCAL/lib -L$DESTDIR/x264" \
+        CFLAGS="-I$LOCAL/include -fPIE -pie" \
+        LDFLAGS="-L$LOCAL/lib -L$DESTDIR/x264 -fPIE -pie" \
         LIBS="-lavformat -lavcodec -lavutil -lz -lx264" \
         CC="$CC" \
         LD="$LD" \
