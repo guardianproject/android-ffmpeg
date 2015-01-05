@@ -66,7 +66,8 @@ $DEBUG_FLAG \
 --disable-network \
 \
 --enable-libx264 \
---enable-zlib
+--enable-zlib \
+--enable-muxer=md5
 
 popd; popd
 
