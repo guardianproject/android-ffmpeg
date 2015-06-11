@@ -23,6 +23,7 @@ autoreconf --install --force --verbose
         --enable-static \
         --disable-shared \
         --with-ffmpeg \
+        --with-pic \
         --without-libltdl
 
 
