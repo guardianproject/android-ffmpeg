@@ -9,4 +9,4 @@
 	url = git://git.sv.gnu.org/freetype/freetype2.git
 [submodule "sox"]
 	path = sox
-	url = git://git.code.sf.net/p/sox/code
+	url = https://github.com/guardianproject/sox.git
