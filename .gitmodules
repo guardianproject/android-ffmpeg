@@ -1,6 +1,6 @@
 [submodule "ffmpeg"]
 	path = ffmpeg
-	url = git://git.videolan.org/ffmpeg.git
+	url = https://github.com/bbcallen/FFmpeg.git
 [submodule "x264"]
 	path = x264
 	url = git://git.videolan.org/x264.git
