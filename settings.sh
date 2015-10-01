@@ -7,6 +7,11 @@ if [[ "x$NDK_BASE" == "x" ]]; then
     echo "No NDK_BASE set, using $NDK_BASE"
 fi
 
+if [[ "x$NDK_ABI" == "x" ]]; then
+    NDK_ABI=arm
+    echo "No NDK_ABI set, using $NDK_ABI"
+fi
+
 # Android now has 64-bit and 32-bit versions of the NDK for GNU/Linux.  We
 # assume that the build platform uses the appropriate version, otherwise the
 # user building this will have to manually set NDK_PROCESSOR or NDK_TOOLCHAIN.
@@ -17,18 +22,33 @@ else
 fi
 
 # Android NDK setup
-NDK_PLATFORM_LEVEL=16
-NDK_ABI=arm
+case $NDK_ABI in
+  arm)
+    NDK_PLATFORM_LEVEL=16
+    TARGET_CPU=armv7-a
+    EXTRA_CFLAGS="-mfpu=neon"
+    EXTRA_LDFLAGS=""
+  ;;
+  x86)
+    NDK_PLATFORM_LEVEL=16
+    TARGET_CPU=x86
+    EXTRA_CFLAGS="-mtune=atom -mssse3 -mfpmath=sse"
+    EXTRA_LDFLAGS=""
+  ;;
+esac
+
 NDK_COMPILER_VERSION=4.6
 NDK_SYSROOT=$NDK_BASE/platforms/android-$NDK_PLATFORM_LEVEL/arch-$NDK_ABI
 NDK_UNAME=`uname -s | tr '[A-Z]' '[a-z]'`
-if [ $NDK_ABI = "x86" ]; then
+
+if [[ "$NDK_ABI" == "x86" ]]; then
     HOST=i686-linux-android
-    NDK_TOOLCHAIN=$NDK_ABI-$NDK_COMPILER_VERSION
+    NDK_TOOLCHAIN=x86-$NDK_COMPILER_VERSION
 else
     HOST=$NDK_ABI-linux-androideabi
     NDK_TOOLCHAIN=$HOST-$NDK_COMPILER_VERSION
 fi
+
 NDK_TOOLCHAIN_BASE=$NDK_BASE/toolchains/$NDK_TOOLCHAIN/prebuilt/$NDK_UNAME-$NDK_PROCESSOR
 
 CC="$NDK_TOOLCHAIN_BASE/bin/$HOST-gcc --sysroot=$NDK_SYSROOT"

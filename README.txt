@@ -40,6 +40,9 @@ line.  For example, using the 32-bit NDK on a 64-bit system:
 
     NDK_COMPILER_VERSION=4.4.3 ./configure_make_everything.sh
 
+ Or building for an x86 Android target:
+
+    NDK_ABI=x86 ./configure_make_everything.sh
 
 customizing
 -----------

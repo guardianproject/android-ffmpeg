@@ -22,25 +22,36 @@ patch -d ffmpeg -N -p1 --reject-file=- < \
 
 pushd ffmpeg
 
+if [[ $NDK_ABI == "arm" ]]; then
+  EXTRA_CFLAGS="$EXTRA_CFLAGS -mfloat-abi=softfp -mfpu=neon"
+fi
+
+if [[ $NDK_ABI == "x86" ]]; then
+  EXTRA_CFLAGS="$EXTRA_CFLAGS -mtune=atom -mssse3 -mfpmath=sse"
+  NDK_TOOLCHAIN_BASE=$NDK_BASE/toolchains/x86-4.8/prebuilt/$NDK_UNAME-$NDK_PROCESSOR #force gcc 4.8 because of http://www.ffmpeg.org/faq.html#error_003a-can_0027t-find-a-register-in-class-_0027GENERAL_005fREGS_0027-while-reloading-_0027asm_0027
+fi
+
+
 ./configure \
 $DEBUG_FLAG \
---arch=arm \
---cpu=cortex-a8 \
+--arch=$NDK_ABI \
+--cpu=$TARGET_CPU \
 --target-os=linux \
---enable-runtime-cpudetect \
+--enable-cross-compile \
 --prefix=$prefix \
 --enable-pic \
 --disable-shared \
 --enable-static \
---cross-prefix=$NDK_TOOLCHAIN_BASE/bin/$NDK_ABI-linux-androideabi- \
+--cross-prefix=$NDK_TOOLCHAIN_BASE/bin/$HOST- \
 --sysroot="$NDK_SYSROOT" \
---extra-cflags="-I../x264 -mfloat-abi=softfp -mfpu=neon -fPIE -pie" \
+--extra-cflags="-I../x264 -fPIE -pie $EXTRA_CFLAGS" \
 --extra-ldflags="-L../x264 -fPIE -pie" \
 \
 --enable-version3 \
 --enable-gpl \
 \
 --disable-doc \
+--disable-avx \
 --enable-yasm \
 \
 --enable-decoders \
